@@ -7,7 +7,7 @@ It performs read-only checks for system resources, temperature and throttling, s
 ## Quick install from Git
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/pi-service-doctor.git
+git clone https://github.com/snuffsprojects/pi-service-doctor.git
 cd pi-service-doctor
 sudo ./install.sh
 ```
