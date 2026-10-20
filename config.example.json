@@ -1,0 +1,27 @@
+{
+  "name": "My Raspberry Pi",
+  "diskPath": "/",
+  "thresholds": {
+    "diskWarningPercent": 80,
+    "diskCriticalPercent": 92,
+    "memoryWarningPercent": 85,
+    "memoryCriticalPercent": 95,
+    "temperatureWarningC": 72,
+    "temperatureCriticalC": 80,
+    "fileWarningHours": 24
+  },
+  "services": [
+    {"name": "nginx", "label": "Web server", "required": true},
+    {"name": "ssh", "label": "Secure shell", "required": true}
+  ],
+  "timers": [],
+  "ports": [
+    {"host": "127.0.0.1", "port": 80, "label": "Local web server", "required": true}
+  ],
+  "urls": [
+    {"url": "http://127.0.0.1/", "label": "Home page", "expected": [200], "required": true}
+  ],
+  "files": [],
+  "ignoreFailedUnits": ["run-*.service"]
+}
+

@@ -1,0 +1,7 @@
+config.json
+status.json
+__pycache__/
+*.py[cod]
+.coverage
+.pytest_cache/
+

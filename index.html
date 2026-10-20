@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0e1110">
+  <title>Pi Service Doctor</title>
+  <link rel="stylesheet" href="doctor.css?v=20261020">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to health report</a>
+  <header class="topbar">
+    <a class="brand" href="../Dashboard2/" aria-label="Back to Dashboard 2"><span class="brand-mark">Rx</span><span><strong>Pi Service Doctor</strong><small>Read-only system health</small></span></a>
+    <nav><a href="#systems">System</a><a href="#checks">Checks</a><a href="../Dashboard2/">← Dashboard 2</a></nav>
+  </header>
+
+  <main id="main-content">
+    <section class="hero">
+      <div><p class="eyebrow">Morning rounds</p><h1>Your Pi,<br><em>examined.</em></h1><p>A fast, read-only check of resources, services, scheduled work and every route that keeps the intranet useful.</p></div>
+      <div class="hero-status loading" id="hero-status"><span class="status-orb" aria-hidden="true"></span><div><small>Overall health</small><strong id="overall-label">Reading report…</strong><p id="checked-time">Waiting for the latest examination</p></div><button id="refresh" type="button">Refresh display</button></div>
+    </section>
+
+    <section class="summary-grid" aria-label="Health summary">
+      <article class="summary-card"><span class="summary-icon healthy">✓</span><div><small>Healthy</small><strong id="healthy-count">—</strong><p>Checks passing normally</p></div></article>
+      <article class="summary-card"><span class="summary-icon warning">!</span><div><small>Warnings</small><strong id="warning-count">—</strong><p>Worth keeping an eye on</p></div></article>
+      <article class="summary-card"><span class="summary-icon critical">×</span><div><small>Critical</small><strong id="critical-count">—</strong><p>Needs attention</p></div></article>
+      <article class="summary-card"><span class="summary-icon neutral">◷</span><div><small>Check duration</small><strong id="duration">—</strong><p>Cached every five minutes</p></div></article>
+    </section>
+
+    <section class="section-block" id="systems">
+      <div class="section-heading"><div><p class="eyebrow">Vital signs</p><h2>System resources</h2></div><span id="host-summary">Loading host information…</span></div>
+      <div class="vitals-grid" id="vitals-grid"><div class="loading-card">Reading system metrics…</div></div>
+    </section>
+
+    <section class="section-block" id="checks">
+      <div class="section-heading"><div><p class="eyebrow">Full examination</p><h2>Checks</h2></div><div class="filters" id="filters" role="group" aria-label="Filter checks"></div></div>
+      <div class="check-groups" id="check-groups" aria-live="polite"><div class="loading-card">Loading checks…</div></div>
+    </section>
+  </main>
+
+  <footer><span>Pi Service Doctor · dependency-free Python</span><span>Read-only checks · cached locally · no browser access to system commands</span></footer>
+  <script src="doctor.js?v=20261020"></script>
+</body>
+</html>
+
