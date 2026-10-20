@@ -1,5 +1,10 @@
 (()=>{'use strict';
 let report=null,filter='all';
+const intranet=location.pathname.includes('/intranet/');
+const home=intranet?'../Dashboard2/':'/';
+document.getElementById('home-link').href=home;
+document.getElementById('back-link').href=home;
+document.getElementById('back-link').textContent=intranet?'← Dashboard 2':'← Home';
 const names={system:'System',service:'Services',timer:'Timers',port:'Ports',url:'Web routes',file:'Data freshness'};
 const esc=value=>{const node=document.createElement('span');node.textContent=String(value??'');return node.innerHTML};
 const relative=value=>{const seconds=Math.max(0,(Date.now()-new Date(value).getTime())/1000);if(seconds<90)return 'just now';if(seconds<3600)return `${Math.floor(seconds/60)} minutes ago`;if(seconds<86400)return `${Math.floor(seconds/3600)} hours ago`;return `${Math.floor(seconds/86400)} days ago`};

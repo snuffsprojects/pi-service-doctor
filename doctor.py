@@ -20,8 +20,11 @@ from urllib.request import Request, urlopen
 
 
 ROOT = Path(__file__).resolve().parent
-DEFAULT_CONFIG = ROOT / "config.json"
-DEFAULT_OUTPUT = ROOT / "status.json"
+VERSION = "1.0.0"
+SYSTEM_CONFIG = Path("/etc/pi-service-doctor/config.json")
+SYSTEM_OUTPUT = Path("/var/lib/pi-service-doctor/status.json")
+DEFAULT_CONFIG = Path(os.environ.get("PI_SERVICE_DOCTOR_CONFIG", SYSTEM_CONFIG if SYSTEM_CONFIG.exists() else ROOT / "config.json"))
+DEFAULT_OUTPUT = Path(os.environ.get("PI_SERVICE_DOCTOR_OUTPUT", SYSTEM_OUTPUT if SYSTEM_OUTPUT.parent.exists() else ROOT / "status.json"))
 LEVELS = {"healthy": 0, "warning": 1, "critical": 2, "unknown": 1}
 
 
@@ -264,6 +267,7 @@ def print_report(report: dict) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--version", action="version", version=f"Pi Service Doctor {VERSION}")
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--output", type=Path, help="Write the complete report atomically as JSON")
     parser.add_argument("--json", action="store_true", help="Print JSON instead of the human report")

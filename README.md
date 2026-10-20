@@ -1,55 +1,112 @@
 # Pi Service Doctor
 
-A small, dependency-free Raspberry Pi health checker with human-readable CLI output, atomic JSON reports and a responsive static dashboard.
+A small, dependency-free Raspberry Pi health checker with a friendly CLI, atomic JSON reports and a responsive web dashboard.
 
-It performs read-only checks for system resources, temperature and throttling, systemd services and timers, failed units, TCP ports, HTTP endpoints and file freshness. Checks are configured in JSON, so the project can monitor another Pi without source changes.
+It performs read-only checks for system resources, temperature and throttling, systemd services and timers, failed units, TCP ports, HTTP endpoints and file freshness. A five-minute systemd timer builds the report; the browser only reads that cache and cannot execute commands.
 
-## Quick start
-
-```bash
-cp config.example.json config.json
-python3 doctor.py
-python3 doctor.py --output status.json --always-zero
-```
-
-Open `index.html` through a web server after producing `status.json`. The dashboard never executes system commands; it only reads the cached report.
-
-## Exit codes
-
-- `0`: all checks healthy
-- `1`: warning or unknown check
-- `2`: critical check or invalid configuration
-
-Use `--always-zero` from a timer so a detected problem does not turn the collector itself into a failed systemd unit.
-
-## Configuration
-
-Copy `config.example.json` to `config.json`. Local configuration and generated status are ignored by Git. Every service, timer, port, URL and file target supports a user-facing `label`; network and service checks also support `required: false` to make failure a warning instead of critical.
-
-`ignoreFailedUnits` accepts shell-style patterns. This is useful for transient `systemd-run` units which otherwise remain listed as failed after a one-off diagnostic command.
-
-## systemd
-
-Adjust paths in the included service if the project is installed somewhere other than `/var/www/html/intranet/pi-service-doctor`, then install:
+## Quick install from Git
 
 ```bash
-sudo install -m 0644 pi-service-doctor.service /etc/systemd/system/
-sudo install -m 0644 pi-service-doctor.timer /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now pi-service-doctor.timer
+git clone https://github.com/YOUR-USERNAME/pi-service-doctor.git
+cd pi-service-doctor
+sudo ./install.sh
 ```
 
-The included service runs without root privileges and uses systemd filesystem and privilege restrictions.
+The installer:
 
-## Privacy
+- discovers common active services and timers;
+- creates a safe starter configuration;
+- installs a hardened, unprivileged systemd collector;
+- enables five-minute reports;
+- installs the static dashboard under `/var/www/html/pi-service-doctor`;
+- preserves configuration when run again for an upgrade.
 
-Do not commit `config.json` or `status.json` if they contain private hostnames, addresses or paths. The provided `.gitignore` excludes both. The example configuration contains only generic loopback targets.
+If `/var/www/html` is your web-server root, open:
+
+```text
+http://YOUR-PI/pi-service-doctor/
+```
+
+The installer does not install or reconfigure nginx, Apache or another web server. Use `--no-web` for a CLI-only installation, or `--web-root PATH` for a different document root.
 
 ## Requirements
 
+- A Linux system using systemd
 - Python 3.10 or newer
-- Linux `/proc` for memory and uptime metrics
-- systemd for service/timer checks
-- `vcgencmd` is optional; standard thermal sysfs is tried first
+- Optional Raspberry Pi `vcgencmd`; standard thermal sysfs is checked first
+- Optional existing web server for the dashboard
 
-Released under the MIT License.
+No Python packages, Node modules, database or cloud account are required.
+
+## Configuration
+
+The automatic configuration is intentionally conservative. Edit:
+
+```text
+/etc/pi-service-doctor/config.json
+```
+
+Add the services, timers, ports, URLs and freshness-sensitive files that matter on your Pi. `config.example.json` documents every section. Targets support a friendly `label`; network and service checks support `required: false` when failure should be a warning rather than critical.
+
+To safely regenerate suggestions without modifying the live configuration:
+
+```bash
+python3 configure.py --output suggested-config.json --non-interactive
+```
+
+Restarting is unnecessary after configuration changes. The next timer run reads the new file.
+
+## CLI
+
+After installation:
+
+```bash
+pi-service-doctor
+pi-service-doctor --json
+pi-service-doctor --version
+```
+
+Exit codes are `0` for healthy, `1` for warning/unknown and `2` for critical or invalid configuration. `--always-zero` is intended for schedulers so detected problems do not mark the checker itself as failed.
+
+## Upgrade
+
+```bash
+git pull --ff-only
+sudo ./install.sh
+```
+
+The installer replaces application and web assets but preserves `/etc/pi-service-doctor/config.json` and existing reports.
+
+## Uninstall
+
+```bash
+sudo ./uninstall.sh
+```
+
+Configuration and reports are preserved by default. Use `sudo ./uninstall.sh --purge` to remove those too.
+
+## Installer options
+
+```text
+--user USER          unprivileged account used for checks
+--app-dir PATH       application installation directory
+--config-dir PATH    configuration directory
+--state-dir PATH     generated-report directory
+--web-root PATH      existing web-server document root
+--no-web             CLI and scheduled reports only
+--no-systemd         stage files without installing services (testing)
+```
+
+## Security and privacy
+
+Use the dashboard only on a trusted LAN or behind an authenticated reverse proxy. Reports can reveal hostnames, service names, ports and local paths. Local configuration and generated status are excluded by `.gitignore`; do not add secrets to labels or monitored URLs. See [SECURITY.md](SECURITY.md).
+
+## Development
+
+```bash
+python3 -m unittest -v
+python3 -m py_compile doctor.py configure.py
+sh -n install.sh uninstall.sh
+```
+
+The project is released under the MIT License. Bundled Barlow font files are distributed under the SIL Open Font License included in `fonts/OFL-Barlow.txt`.

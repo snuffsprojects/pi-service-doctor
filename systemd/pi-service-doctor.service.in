@@ -1,0 +1,19 @@
+[Unit]
+Description=Generate the Pi Service Doctor health report
+After=network.target
+
+[Service]
+Type=oneshot
+User=@SERVICE_USER@
+Group=@SERVICE_GROUP@
+WorkingDirectory=@APP_DIR@
+ExecStart=/usr/bin/python3 @APP_DIR@/doctor.py --config @CONFIG_FILE@ --output @STATUS_FILE@ --quiet --always-zero
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ReadWritePaths=@STATE_DIR@
+
